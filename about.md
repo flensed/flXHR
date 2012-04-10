@@ -1,43 +1,41 @@
-Cross-Domain Ajax with Flash, not Ajax vs. Flash
+About flensed
+The What
 
-flXHR [flĕkʹsər],(flex-er) is a *client-based* cross-browser, XHR-compatible tool for cross-domain Ajax (Flash) communication. It utilizes an invisible flXHR.swf instance that acts as sort of a client-side proxy for requests, combined with a Javascript object/module wrapper that exposes an identical interface to the native XMLHttpRequest (XHR) browser object, with a few helpful additions and a couple of minor limitations (see the documentation for more details).
+flensed is a collection of completely free and open-source UI tools and widgets which fundamentally are based on the incredible, often untapped, enabling functionalities provided by the Flash Player plugin in modern browsers.
+The Flash Player plugin is installed in 99% of all web browsers.
 
-flXHR requires plugin v9.0.124 for security reasons. See the documentation for a configuration flag "autoUpdatePlayer" which will attempt to automatically inline update the plugin if need be.
+The foundational flensed project is CheckPlayer, which extends the SWFObject Library External Link in some useful ways that make it easier to attach SWF's to a web page at any point in the DOM's lifespan. The functionality of CheckPlayer allows all other flensed projects to easily leverage SWF's in ways that web authors before have scarcely been able to achieve.
 
-The result is that flXHR can be used as a drop-in replacement for XHR based Ajax, giving you consistent, secure, efficient cross-domain client-to-server cross-domain Ajax communication, without messy workarounds such as IFRAME proxies, dynamic script tags, or server-side proxying.
+The idea is to leverage SWF support in a browser (which Adobe claims is now 99% worldwide External Link) to solve some difficult problems that website authors commonly struggle with when trying to push their sites to the limits of Web 2.0, 3.0, whatever. These projects are based on the premise that SWF's can be added to a webpage dynamically and unobtrusively, combined and controlled with intelligent, integrated Javascript code and some supportive HTML markup, to address those problems.
+The Where
 
-flXHR brings a whole new world of cross-domain Ajax and API-consistency to any browser with Javascript and Flash Player plugin v9+ support (Adobe claims Flash has 99% browser support now External Link). No other methods or workarounds can claim that kind of wide-spread support or consistency. In addition, flXHR boasts the ability to be dropped-in to many different Javascript frameworks (Dojo, Prototype, jQuery, etc) for even easier and more robust Ajax usage.
+If you're wondering if flensed has any real world potential...
 
-Here's a brief overview of flXHR's capability compared to other Flash-Ajax solutions:
-Feature	flXHR	Fjax	SWFHttpRequest	FlashXMLHttpRequest	F4A
-cross-domain communication 	X 	X(1) 	X(1) 	X(1) 	X(1)
-automatic SWF embed 	X 	X(2) 	-- 	X(2) 	X(2)
-native XHR API compatible 	X 	-- 	-- 	-- 	--
-easily integrated with JS frameworks 	X 	-- 	X(4) 	X(4) 	X(4)
-Flash plugin version compatible (3) 	9.0.124+ 	6+ 	9+ 	6+ 	8+
-Flash plugin auto-update 	X 	-- 	-- 	-- 	--
-XHR API extensions, like robust error-callbacks, timeouts, etc 	X 	-- 	-- 	-- 	--
+    Pointserve, Inc. External Link (Austin, TX)
+    Pointserve uses some of the flensed projects (CheckPlayer and flXHR) to solve third-party application integration and UX usability issues with some of their clients.
+    Read More
 
-(1) Does not allow any other cross-domain policy besides the root /crossdomain.xml, which makes it less flexible and thus less secure than flXHR.
-(2) These libraries use more primitive, less mature/stable solutions, compared to flXHR's use of SWFObject 2.1 library.
-(3) It may seem like a benefit to have more backwards-compatibility, but actually, since the later plugins have had better security and better communication efficiency, the later the plugin version leveraged, the better the solution will ultimately be. flXHR is the only one to specifically leverage the full security model just implemented with the 9.0.124 plugin release.
-(4) While these solutions can be integrated with some frameworks under special circumstances, they each have limitations which will prevent this consistently from working in all frameworks, all browsers, and in all circumstances. flXHR is much more robust, and will work under any number of circumstances and with virtually any JS framework which is already XHR-aware.
 
-Here's a brief overview of flXHR's capability compared to XHR and other non-flash client-side cross-domain workarounds:
-Feature	flXHR	XHR	IFRAME	<SCRIPT>
-interoperable with major Javascript frameworks 	X 	X 	X(1) 	X(1)
-cross-domain requests 	X 	X(2) 	X 	X
---> robust author/server security authorization 	X 	-- 	-- 	--
---> consistent cross-browser usage 	X 	-- 	-- 	--
-response event driven (readyState, etc) 	X 	X 	-- 	X(3)
-response content-type agnostic 	X 	X 	X 	--
-callback error handling 	X 	-- 	-- 	--
-timeout event handling 	X 	X(4) 	-- 	--
-robust memory management compatible 	X 	X 	-- 	--
+The How
 
-(1) Depending on framework, these methods may or may not be implemented.
-(2) XHR in the new FF3/IE8 generation will support this, but the implementation and usage details are not going to be consistent, which will require custom browser-dependent code to create a consistent usage interface. It's not supported natively at all prior to the next-gen browsers.
-(3) Depending on the type and style of content sent back from the server, the eval()'d Javascript/JSON code can set itself to automatically execute once it fully loads, simulating the response event-driven behavior.
-(4) IE8 has announced support for the timeout event and ontimeout handler. Unknown support for FF3. Not supported directly (that is, without custom code logic around it) in any other browsers.
+All flensed projects use (and come bundled with) a set of utility functions called the flensedCore. Some projects dynamically add additional functions to this set. This handful of small utility functions is similar to a small subset of the functionality you might find in existing Javascript frameworks, including 'getObjectById', 'bindEvent', 'parseXMLString', etc. All Core functions are public and available to web authors to use as needed.
+flensed offers real solutions now, using almost universal existing technology.
 
-As you can see, for the most part, flXHR implements an XHR API-compatible interface with a pile of extra/enhanced functionality, including most notably, direct non-proxy'd cross-domain client-to-server communication. 
+flensed projects come in two flavors. Some of the projects are primarily focused on letting SWF's be invisible to the viewer, but nonetheless do some heavy lifting in the background. For instance, flXHR addresses the need for a clean, efficient, and API-compatible way to make cross-domain calls from client to server. flACHEY aims to provide a unique way of slashing to a fraction the amount of client download needed for the common Javascript frameworks which are already deployed to such a wide audience. Why should a user have to visit 100 different websites and download Dojo or jQuery 100 times because the browser isn't smart enough to allow common code sharing between the sites? flACHEY will make that a reality. So in an ironic nod to the many diehard Javascript'ers who would normally reject a solution based on Flash, flACHEY provides an easy way for web authors to make their site's Javascript resources shareable which ultimately improves download times and user experience for all visitors.
+
+The other flavor of flensed projects focus more on the visible presentation of interactive webpage elements. Essentially, strategically placed SWF's will masquerade as intelligent drop-in replacements for common presentation elements, such as images, menus, or form elements. Certainly all these things can be done now, but authors and frameworks have to jump through endless hoops to keep the presentation consistent for all viewers.
+
+Flash Player plugins in all modern browsers create an almost entirely consistent presentation canvas, and sometimes can even be done in smaller download size than their Javascript/CSS counterparts. Many have used SWF's on web pages for all these items before, and many others have rejected these options because of the lack of semantics, search-engine friendliness, and accessibility issues that a large section of current SWF implementations suffer from. flensed re-thinks these issues from the ground up, and uses the minimal amount of SWF to achieve the consistency that users deserve, while still giving web authors the strongest and most forward-thinking presentation layer solutions possible.
+The Why
+Strategically placed SWF's masquerade as intelligent drop-in replacements for common presentation elements.
+
+In some cases, these projects seek to offer an alternative to existing approaches and workarounds (most of which are written by those who avidly adhere only to creative/hackish Javascript/CSS as the silver bullet). Because they accomplish so many amazing things with magical Javascript artistry, they probably scoff at the idea that sometimes a browser plugin may be of assistance. I respect that view and won't try to convince you otherwise. But I respectfully disagree, and I present flensed in contrast to that mindset. I submit to the general web author audience that despite Flash's perhaps sometimes dubious reputation, there are plenty of advantages which may have been overlooked in the rush to escalate Javascript's ubiquity, as if the world of plugins is now somehow the second-class citizen in the web community.
+
+In other cases, the solutions provided by flensed projects yield a novel, unique solution which has yet to be properly addressed by the web community. In either case, there is a segement of the web author community who is mainly pushing on the browser vendors to find unity on these concerns, but they have been waiting a very long time already, and I believe will continue to have to wait for the painful machinations of browser evolution to churn out a "solution".
+
+While the utopian view of this being "the right solution" is very idealistic and attractive, the practicality is that there are many websites right now which need to address these issues and don't have the luxury of that waiting game. flensed offers real solutions now, and it relies on existing technology that is almost universally deployed among the common web audience environments.
+
+I suggest that right now there is no other highly consistent cross-browser solution out there which comes nearly as close to achieving a 99% spread of the worldwide web audience. On that point alone, I believe that the flensed projects have a lot to offer to the website author/programmer, at least for deeper consideration. What I am suggesting is that maybe it wouldn't hurt if we did some re-thinking on some of these topics, which is what flensed is doing.
+The Who
+
+No, not the band External Link. flensed is an open-source effort put out by Getify Solutions, Inc., a small web design and hosting company in Austin, TX. Kyle Simpson is the primary author, and he does this stuff in his free time. 
