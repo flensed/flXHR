@@ -1,0 +1,280 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Tutorial #1 (Photo Album Viewer)</title>
+
+
+<script language="Javascript" type="text/javascript" src="../build/flXHR.js"></script>
+
+<script language="javascript">
+
+/* *******************************************
+
+This demo example shows a VERY simplified multi-stage on-demand loading album/photo viewer concept.
+
+Please note that a link for one of the albums, and a link for one of the photos, are INTENTIONALLY broken, to illustrate a
+realistic usage of the handleError functionality.
+
+Note: If you do not have at least the 9.0.124 plugin version, this demo will throw an error to the handleError function.
+Also: See the (http://flxhr.flensed.com/documentation.php) documentation for the "autoUpdatePlayer"
+configuration flag, which allows flXHR to try to automatically inline update the player plugin version for you and your users
+if it's not at least 9.0.124.
+
+********************************************** */
+
+var albumlistloader = new flensed.flXHR();
+albumlistloader.onreadystatechange = handleAlbumListLoading;
+albumlistloader.onerror = handleError;
+albumlistloader.loadPolicyURL = "http://test.getify.com/flXHR-tests/policy.php";
+
+
+function handleAlbumListLoading(loadObj) {
+	if (loadObj.readyState == 4) {	// fully loaded!
+		buildAlbumList(loadObj.responseXML);
+		flensed.getObjectById("loadingMessage").style.display = "none";
+	}
+}
+
+function buildAlbumList(listXML) {
+	flensed.bindEvent(flensed.getObjectById("photo"),"onload",showPhoto);
+	var list = flensed.getObjectById("albumlistcontent");
+
+	var albums = listXML.childNodes[listXML.childNodes.length-1].childNodes;
+	for (var i=0; i<albums.length; i++) {
+		if (albums[i].nodeName == "album") {
+			(function(){	// only to create a separate closure for each 'albumid' local variable definition with
+							// each iteration of the loop, so that the binding in the bindEvent call will be correct.
+				var albumid = albums[i].getAttribute("id");
+				var albumname = albums[i].getAttribute("label");
+			
+				var alink = document.createElement("a");
+				var alinktext = document.createTextNode(albumname);
+				alink.appendChild(alinktext);
+				alink.href = "#";
+				list.appendChild(alink);
+				flensed.bindEvent(alink,"onclick", function(){ 
+					loadPhotoList(albumid); 
+					clearListStyles("albumlistcontent"); 
+					alink.style.fontWeight = "bold"; 
+					return false; 
+				});
+			})();
+		}
+	}
+}
+
+albumlistloader.open("POST","http://test.getify.com/flXHR-tests/albumlist.php");	// these calls will be queued until the flXHR instance is ready
+albumlistloader.send();
+
+
+/* ******************************************************************* */
+
+
+var photolistloader = new flensed.flXHR();
+photolistloader.onreadystatechange = handlePhotoListLoading;
+photolistloader.onerror = handleError;
+photolistloader.loadPolicyURL = "http://test.getify.com/flXHR-tests/policy.php";
+
+
+function handlePhotoListLoading(loadObj) {
+	if (loadObj.readyState == 4) {	// fully loaded!
+		buildPhotoList(loadObj.responseXML);
+		flensed.getObjectById("loadingMessage").style.display = "none";
+	}
+}
+
+function buildPhotoList(listXML) {
+	var list = flensed.getObjectById("photolistcontent");
+
+	var albumid = listXML.childNodes[listXML.childNodes.length-1].getAttribute("albumid");
+	var photos = listXML.childNodes[listXML.childNodes.length-1].childNodes;
+	for (var i=0; i<photos.length; i++) {
+		if (photos[i].nodeName == "photo") {
+			(function(){	// only to create a separate closure for each 'photoid', 'photoname', and 'photourl' local variable definition 
+							// with each iteration of the loop, so that the binding in the bindEvent call will be correct.
+				var photoid = photos[i].getAttribute("id");
+				var photoname = photos[i].getAttribute("label");
+				var photourl = photos[i].getAttribute("url");
+			
+				var alink = document.createElement("a");
+				var alinktext = document.createTextNode(photoname);
+				alink.appendChild(alinktext);
+				alink.href = "#";
+				list.appendChild(alink);
+				alink.onclickfunc = function() { 
+					loadPhoto(albumid,photoid,photoname,photourl);
+					clearListStyles("photolistcontent"); 
+					alink.style.fontWeight = "bold";
+					return false; 
+				};
+				flensed.bindEvent(alink,"onclick",alink.onclickfunc);
+			})();
+		}
+	}
+}
+
+function loadPhotoList(albumId) {
+	flensed.getObjectById("loadingMessage").style.display = "block";
+	
+	clearPhoto();
+	clearList("photolistcontent");
+
+	var request = "album="+albumId;
+	photolistloader.instanceId = "album_"+albumId;
+	photolistloader.open("GET","http://test.getify.com/flXHR-tests/photolist.php");
+	photolistloader.send(request);
+}
+
+/* ******************************************************************* */
+
+
+var photoloader = new flensed.flXHR();
+photoloader.onreadystatechange = handlePhotoLoading;
+photoloader.xmlResponseText = false;
+photoloader.onerror = handleError;
+photoloader.loadPolicyURL = "http://test.getify.com/flXHR-tests/policy.php";
+
+function showPhoto() {
+	flensed.getObjectById("photo").style.display = "block";
+}
+
+function handlePhotoLoading(loadObj) {
+	if (loadObj.readyState == 4) {	// fully loaded!
+		var photodesc = flensed.getObjectById("photodesccontent");
+		photodesc.innerHTML = loadObj.responseText;
+	
+		flensed.getObjectById("photoname").style.display = "block";
+		flensed.getObjectById("photodesccontent").style.display = "block";
+
+		flensed.getObjectById("loadingMessage").style.display = "none";
+	}
+}
+
+function loadPhoto(albumId,photoId,photoName,photoURL) {
+	flensed.getObjectById("loadingMessage").style.display = "block";
+
+	clearPhoto();
+	flensed.getObjectById("photoname").innerHTML = photoName;
+	flensed.getObjectById("photo").src = photoURL;
+
+	var request = "album="+albumId+"&photo="+photoId;
+	photoloader.instanceId = "photo_"+photoId;
+	photoloader.open("GET","http://test.getify.com/flXHR-tests/photodescription.php");
+	photoloader.send(request);
+}
+
+
+/* ******************************************************************* */
+
+function clearListStyles(listId) {
+	var list = flensed.getObjectById(listId);
+	var listlen = list.childNodes.length;
+	for (var i=0; i<listlen; i++) {
+		try { list.childNodes[i].style.fontWeight = ""; } catch (err) { }
+	}	
+}
+
+function clearList(listId) {
+	var list = flensed.getObjectById(listId);
+	var listlen = list.childNodes.length;
+	for (var i=0; i<listlen; i++) {
+		try { list.childNodes[0].detachEvent("onclick",list.childNodes[0].onclickfunc); } catch (err) { }
+		list.removeChild(list.childNodes[0]);
+	}
+}
+
+function clearPhoto() {
+	flensed.getObjectById("photodesccontent").style.display = "none";
+	var photoname = flensed.getObjectById("photoname");
+	photoname.style.display = "none";
+	var image = flensed.getObjectById("photo");
+	image.style.display = "none";
+}
+
+
+function handleError(errObj) {
+	flensed.getObjectById("loadingMessage").style.display = "none";
+
+	var loadingObj = errObj.srcElement.instanceId;
+	if (loadingObj.indexOf("album") >= 0) {	// album list load failed.
+		clearListStyles("albumlistcontent");
+		alert("The '"+loadingObj+"' album failed to load. Try again.");
+	}
+	else if (loadingObj.indexOf("photo") >= 0) { // photo description load failed.
+		clearListStyles("photolistcontent");
+		alert("The '"+loadingObj+"' photo description failed to load. Try again.");
+	}
+	else {
+		alert("The list of albums failed to load. Please refresh the page.");
+	}
+}
+
+
+</script>
+
+<style>
+#albumlist, #photolist, #photodesc {
+	float:left;
+	clear:none;
+	display:inline;
+	border:1px solid #000000;
+	margin-right:5px;
+}
+
+#albumlist { width:125px; height:300px; }
+#photolist { width:150px; height:300px; }
+#photodesc { width:500px; height:500px; }
+
+#photodesc img { display:none; width:500px; height:400px;}
+
+#loadingMessage {
+	color:red;
+	font-size:15px;
+	font-weight:bold;
+	margin-bottom:15px;
+}
+
+#albumlistcontent a, #photolistcontent a {
+	display:block;
+}
+
+</style>
+
+
+</head>
+
+<body>
+
+<p>
+Please note that a link for one of the albums, and a link for one of the photos, are INTENTIONALLY broken, to illustrate a
+realistic usage of the handleError functionality.
+</p>
+<p>
+<b>Note:</b> If you do not have at least the 9.0.124 plugin version, this demo will throw an error to the handleError function.
+<b>Also:</b> See the <a href="http://flxhr.flensed.com/documentation.php">documentation</a> for the "autoUpdatePlayer"
+configuration flag, which allows flXHR to try to automatically inline update the player plugin version for you and your users
+if it's not at least 9.0.124.
+</p>
+
+<h2>My Photo Albums</h2>
+
+<div id="loadingMessage">Loading... Please wait...</div>
+
+<div id="albumlist">
+	<h4>Albums</h4>
+	<div id="albumlistcontent"></div>
+</div>
+<div id="photolist">
+	<h4>Photos</h4>
+	<div id="photolistcontent"></div>
+</div>
+<div id="photodesc">
+	<h4 id="photoname"></h4>
+	<img id="photo" src="" />
+	<div id="photodesccontent"></div>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CheckPlayer Demo #4</title>
+
+<script language="Javascript" type="text/javascript" src="../build/checkplayer.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+CheckPlayer will queue calls to DoSWF() until the version check passes and the library is ready.
+
+********************************************** */
+
+function Check() {
+	var check = new flensed.checkplayer("9.0.115",null,true,updateCB);
+
+	var flashvars = {};
+	var params = {wmode:"transparent", allowScriptAccess:"always", menu:"false", scale:"noscale"};
+	var attributes = { id:"myswf", name:"myswf" };
+
+	// this call will get queued until the library is ready and version check completed.
+	check.DoSWF("../build/sample.swf", "mycontent", "460", "85", flashvars, params, attributes);
+}
+
+function updateCB(checkObj) {
+	if (checkObj.updateStatus == flensed.checkplayer.UPDATE_CANCELED) {
+		alert("Update canceled.");
+	}
+	else if (checkObj.updateStatus == flensed.checkplayer.UPDATE_FAILED) {
+		alert("Update failed. Current version detected:"+checkObj.playerVersionDetected);
+	}
+}
+
+
+</script>
+
+</head>
+
+<body>
+
+<input type="button" value="Get SWF" onclick="Check();" />
+<br /><br />
+<div id="mycontent"></div>
+
+<p>
+	CheckPlayer will queue calls to DoSWF() until the version check passes and the library is ready.
+</p>
+</body>
+</html>

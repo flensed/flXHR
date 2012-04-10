@@ -1,0 +1,56 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CheckPlayer Demo #1</title>
+
+<script language="Javascript" type="text/javascript" src="../build/checkplayer.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+CheckPlayer can be instantiated with a version, autoUpdate, and no callbacks, to create the simplest approach
+to verifying minimum plugin version and updating if need be.
+
+If you visit this page from a browser that has no Flash Player plugin installed, and click the button, it will 
+say the version check failed. If you visit it with a plugin version less than 6.0.65, it will also say the version
+check failed. If you visit the page from a browser with at least version 6.0.65, but less than 9.0.115 (what the 
+demo checks for), you will be prompted to update the plugin. If you visit the page with at least version 9.0.115, 
+and click the button, it will say the version check passed.
+
+********************************************** */
+
+var check = new flensed.checkplayer("9.0.115",null,true);
+
+function Check() {
+	if (check.checkPassed) {
+		alert("The version check passed.");
+	}
+	else {
+		alert("The version check did not pass." + check.playerVersionDetected);
+	}
+}
+
+</script>
+
+</head>
+
+<body>
+
+<input type="button" value="Check Version" onclick="Check();" />
+
+<p>
+	CheckPlayer can be instantiated with a version, autoUpdate, and no callbacks, to create the simplest approach
+	to verifying minimum plugin version and updating if need be.
+</p>
+<p>
+	If you visit this page from a browser that has no Flash Player plugin installed, and click the button, it will 
+	say the version check failed. If you visit it with a plugin version less than 6.0.65, it will also say the version
+	check failed. If you visit the page from a browser with at least version 6.0.65, but less than 9.0.115 (what the 
+	demo checks for), you will be prompted to update the plugin. If you visit the page with at least version 9.0.115, 
+	and click the button, it will say the version check passed.
+</p>
+
+</body>
+</html>

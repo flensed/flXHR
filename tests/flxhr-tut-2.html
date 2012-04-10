@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Tutorial #2 (YQL via flXHR to Flickr/Craigslist)</title>
+
+
+<script language="Javascript" type="text/javascript" src="http://flxhr.flensed.com/js/src/json2.js"></script>
+<script language="Javascript" type="text/javascript" src="http://flxhr.flensed.com/js/oauth.js"></script>
+<script language="Javascript" type="text/javascript" src="http://flxhr.flensed.com/js/sha1.js"></script>
+<script language="Javascript" type="text/javascript" src="http://flxhr.flensed.com/js/yql-oauth.js"></script>
+<script language="Javascript" type="text/javascript" src="http://www.flensed.com/code/build/flXHR.js"></script>
+
+<script language="javascript">
+
+/* *******************************************
+
+This demo shows using YQL (from YDN) through flXHR to make calls to dissimilar data source APIs (Flickr and Craigslist) to mashup
+the resulting data.
+
+********************************************** */
+
+var flproxy = new flensed.flXHR({instancePooling:true,autoUpdatePlayer:true,xmlResponseText:false,noCacheHeader:false,onerror:handleError,onreadystatechange:handleLoading});
+flproxy.setRequestHeader = function(){};
+
+function toQueryString(obj) {
+	var parts = [];
+	for (var each in obj) {
+		if (obj.hasOwnProperty(each)) {
+			parts.push(encodeURIComponent(each)+"="+encodeURIComponent(obj[each]));
+		}
+	}
+	return parts.join("&");
+}
+  
+function doit() {
+	var query = "select * from geo.places where text='SFO'";
+	var url = "http://query.yahooapis.com/v1/yql?"+toQueryString({q:query,format:"json"});
+
+	flproxy.open("GET",
+		makeSignedRequest(
+			"dj0yJmk9RGljRUtyRUNtOE1WJmQ9WVdrOU0xSlhVMlZaTlRJbWNHbzlPRFk0Tnpjd09EUTImcz1jb25zdW1lcnNlY3JldCZ4PTI0",
+			"ab7f35013d0dc4aaf6687024e134b4f02b1ad18e",
+			url
+		)
+	);
+	flproxy.send();
+}
+
+function handleLoading(XHRobj) {
+	if (XHRobj.readyState == 4) {
+		var rsp = JSON.parse(XHRobj.responseText);
+//		document.getElementById("results").innerHTML = JSON.stringify(rsp);
+		document.getElementById("results").innerHTML = XHRobj.responseText;
+	}
+}
+
+function handleError(errObj) {
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+errObj.srcElement.instanceId
+	);
+}
+
+
+</script>
+
+
+</head>
+
+<body>
+
+<p>
+This demo shows using YQL (from YDN) through flXHR to make calls to dissimilar data source APIs (Flickr and Craigslist) to mashup
+the resulting data.
+</p>
+
+<input type="button" value="Fetch Data" onClick="doit()" />
+
+<div id="results"></div>
+
+</body>
+</html>

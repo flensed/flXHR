@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CheckPlayer Demo #3</title>
+
+<script language="Javascript" type="text/javascript" src="../build/checkplayer.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+CheckPlayer can be instantiated with a check status callback and an update status callback. Both callbacks respond
+accordingly based on the status detected for each "event" stage.
+
+This demo illustrates how the updateCB function can be used to apply CSS styling changes to the Update SWF container.
+
+Note: Notice how clicking the button subsequent times results in no further action, because the singleton object
+has already performed its duty and doesn't get re-instantiated subsequent times.
+
+********************************************** */
+
+function Check() {
+	var check = new flensed.checkplayer("9.0.115",checkCB,false,updateCB);
+}
+
+function checkCB(checkObj) {
+	if (checkObj.checkPassed) {
+		alert("The version check passed.");
+	}
+	else {
+		checkObj.UpdatePlayer();
+	}
+}
+
+function updateCB(checkObj) {
+	if (checkObj.updateStatus == flensed.checkplayer.UPDATE_INIT) {
+		checkObj.updateControlsContainer.style.left = "200px";	// move the update container over, so it shows the content behind it.
+	}
+	else if (checkObj.updateStatus == flensed.checkplayer.UPDATE_SUCCESSFUL) {
+		// perhaps close the window for the user so they don't have to?
+	}
+	else if (checkObj.updateStatus == flensed.checkplayer.UPDATE_CANCELED) {
+		alert("Update canceled.");
+	}
+	else if (checkObj.updateStatus == flensed.checkplayer.UPDATE_FAILED) {
+		alert("Update failed. Current version detected:"+checkObj.playerVersionDetected);
+	}
+}
+
+
+</script>
+
+</head>
+
+<body>
+
+<input type="button" value="Check Version" onclick="Check();" />
+
+<p>
+	CheckPlayer can be instantiated with a check status callback and an update status callback. Both callbacks respond
+	accordingly based on the status detected for each "event" stage.
+</p>
+<p>
+	This demo illustrates how the updateCB function can be used to apply CSS styling changes to the Update SWF container.
+</p>
+<p><b>Note:</b> Notice how clicking the button subsequent times results in no further action, because the singleton object
+	has already performed its duty and doesn't get re-instantiated subsequent times.
+</p>
+
+</body>
+</html>

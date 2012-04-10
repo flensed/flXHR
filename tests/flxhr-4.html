@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Demo #4</title>
+
+
+<script language="Javascript" type="text/javascript" src="../build/flXHR.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+This example demonstrates using a timeout value and callback handler to make sure the response doesn't take too long. 
+In this example, the server is configured to delay it's response on every other request, so the first time will not 
+timeout, the second will, the third won't, etc.
+
+********************************************** */
+
+var flproxy = new flensed.flXHR({ autoUpdatePlayer:true, instanceId:"myproxy1", onerror:handleError, onreadystatechange:handleLoading, loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php" });
+flproxy.timeout = 2000; // 2 seconds
+flproxy.ontimeout = handleTimeout;
+var usecount = 0;
+
+function doit() {
+	flproxy.open("POST","http://test.getify.com/flXHR-tests/xmldelay.php");
+	flproxy.send("My name is "+flproxy.instanceId+" (#"+(++usecount)+")");
+}
+
+function handleLoading(XHRobj) {
+	if (XHRobj.readyState == 4) {
+		var xmlStr = "";
+		try { xmlStr = ((XHRobj.responseXML && XHRobj.responseXML.documentElement.nodeName != "parsererror") ? (new XMLSerializer()).serializeToString(XHRobj.responseXML) : ""); }
+		catch (err) { xmlStr = XHRobj.responseXML.xml; }
+
+		alert("readyState:"+XHRobj.readyState
+			//+"\nresponseText:"+XHRobj.responseText
+			+"\nresponseXML:"+xmlStr
+			+"\nstatus:"+XHRobj.status
+			+"\nstatusText:"+XHRobj.statusText
+			+"\nSource Object Id: "+XHRobj.instanceId
+		);
+	}
+}
+
+function handleTimeout(XHRobj) {
+	alert("Oops, '"+XHRobj.instanceId+"' timed out waiting for a response from the server.");
+}
+
+function handleError(errObj) {
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+errObj.srcElement.instanceId
+	);
+}
+
+</script>
+
+</head>
+
+<body>
+
+<p>
+This example demonstrates using a timeout value and callback handler to make sure the response doesn't take too long. 
+In this example, the server is configured to delay it's response on every other request, so the first time will not 
+timeout, the second will, the third won't, etc.
+</p>
+
+
+<input type="button" value="Click Me" onClick="doit();" />
+
+</body>
+</html>

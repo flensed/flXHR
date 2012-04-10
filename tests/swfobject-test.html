@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>SWFObject removeSWF() test</title>
+
+<script language="Javascript" type="text/javascript" src="../build/swfobject.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+var checkForLoad = null;
+var loadTimeout = null
+
+function cachebreak() {
+	return (new Date()).getTime();
+}
+
+function GetSWF() {
+	if (swfobject.hasFlashPlayerVersion("9")) {
+		var attObj = { id:"mycontent", name:"mycontent", data:"../build/sample.swf?"+cachebreak(), width:"460", height:"85" };
+		var parObj = { allowScriptAccess:"always" };
+	
+		var elem = swfobject.createSWF(attObj,parObj,"mycontent");
+		if (elem) {
+			checkForLoad = setInterval(function() {
+				try {
+					if (elem.PercentLoaded() >= 100) {
+						clearInterval(checkForLoad);
+						clearTimeout(loadTimeout);
+						alert("SWF Loaded just fine.");
+					}
+				}
+				catch (err) { }
+			},100);
+			loadTimeout = setTimeout(TimeoutSWF,1);
+		}
+	}
+}
+
+function TimeoutSWF() {
+	clearInterval(checkForLoad);
+	swfobject.removeSWF("mycontent");
+	alert("SWF took too long (more than 1 millisecond) to download.");
+}
+
+</script>
+
+</head>
+
+<body>
+
+<input type="button" value="Get SWF" onclick="GetSWF();" />
+<br /><br />
+<div id="mycontent">some alternate content</div>
+
+</body>
+</html>

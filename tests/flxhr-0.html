@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Demo #0</title>
+
+
+<script language="Javascript" type="text/javascript" src="../build/flXHR.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+Ok, first, this is Demo #0 because I had to add it later, and didn't want to re-number all the other demos. This 
+demo shows the same thing as Demo #1, except it illustrates the (perhaps simpler to understand) syntax of setting 
+properties on the instantiated object rather than sending the configuration as parameters to the constructor of the 
+instance.
+
+********************************************** */
+
+var usecount = 0;
+
+var flproxy = new flensed.flXHR({autoUpdatePlayer:true});
+flproxy.instanceId = "myproxy1";	// optional, helps if you have multiple flXHR instances all going to the same onreadystatechange handler
+flproxy.xmlResponseText = false;	// since we know the response won't be XML compliant, just save the processing time and don't try to convert the response to XML
+flproxy.onreadystatechange = handleLoading;
+flproxy.loadPolicyURL = "http://test.getify.com/flXHR-tests/policy.php";	// only needed if we want our policy to come from a location other than the root of the domain at '/crossdomain.xml'
+																// in this case, I have a php script that returns the cross domain policy content, because I want to send no-cache 
+																// headers to prevent it from being browser cache'd. You could just point to an actual XML file at some other location
+																// as well
+flproxy.open("POST","http://test.getify.com/flXHR-tests/textme.php");
+flproxy.send("My name is "+flproxy.instanceId);					// make the request text unique so that we can illustrate multiple flXHR instances in later demos
+
+
+function handleLoading(XHRobj) {
+	if (XHRobj.readyState == 4) {
+		alert("readyState:"+XHRobj.readyState
+			+"\nresponseText:"+XHRobj.responseText
+			+"\nstatus:"+XHRobj.status
+			+"\nstatusText:"+XHRobj.statusText
+			+"\nSource Object Id: "+XHRobj.instanceId
+		);
+	}
+}
+
+</script>
+
+</head>
+
+<body>
+
+<p>
+Ok, first, this is Demo #0 because I had to add it later, and didn't want to re-number all the other demos. This 
+demo shows the same thing as Demo #1, except it illustrates the (perhaps simpler to understand) syntax of setting 
+properties on the instantiated object rather than sending the configuration as parameters to the constructor of the 
+instance.
+</p>
+<p>
+Request sent, please wait for the response alert.
+</p>
+
+</body>
+</html>

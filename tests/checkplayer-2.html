@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CheckPlayer Demo #2</title>
+
+<script language="Javascript" type="text/javascript" src="../build/checkplayer.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+CheckPlayer can be instantiated with a check status callback, but no autoUpdate, which allows your code to
+programmatically (as opposed to waiting for use action) respond to the event that the check passed or failed.
+
+This demo illustrates how the checkCB function can be used to automatically initiate an update in a similar way to
+passing a 'true' value for the autoUpdate parameter. The same behavior as Demo #1 should apply depending on plugin 
+version when you visit this page.
+
+********************************************** */
+
+var check = new flensed.checkplayer("9.0.115",checkCB);
+
+function checkCB(checkObj) {
+	if (checkObj.checkPassed) {
+		alert("The version check passed.");
+	}
+	else {
+		checkObj.UpdatePlayer();
+	}
+}
+
+</script>
+
+</head>
+
+<body>
+
+<p>
+	CheckPlayer can be instantiated with a check status callback, but no autoUpdate, which allows your code to
+	programmatically (as opposed to waiting for use action) respond to the event that the check passed or failed.
+</p>
+<p>
+	This demo illustrates how the checkCB function can be used to automatically initiate an update in a similar way to
+	passing a 'true' value for the autoUpdate parameter. The same behavior as Demo #1 should apply depending on plugin 
+	version when you visit this page.
+</p>
+
+</body>
+</html>

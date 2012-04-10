@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Local Test</title>
+
+
+<script language="Javascript" type="text/javascript" src="http://www.flensed.com/code/build/flXHR.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+Test of flash cross-domain policy enforcement. Communication attempt *should* fail.
+
+********************************************** */
+
+var flproxy = new flensed.flXHR({ instanceId:"myproxy1", onerror:handleError, onreadystatechange:handleLoading, loadPolicyURL:"http://www.flensed.com/crossdomain.xml" });
+var usecount = 0;
+
+function doit() {
+	flproxy.open("GET","http://www.flensed.com/test.txt");
+	flproxy.send();
+}
+
+function handleLoading(XHRobj) {
+	if (XHRobj.readyState == 4) {
+		alert("readyState:"+XHRobj.readyState
+			+"\nresponseText:"+XHRobj.responseText
+			+"\nstatus:"+XHRobj.status
+			+"\nstatusText:"+XHRobj.statusText
+			+"\nSource Object Id: "+XHRobj.instanceId
+		);
+	}
+}
+
+function handleError(errObj) {
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+errObj.srcElement.instanceId
+	);
+}
+
+</script>
+
+</head>
+
+<body>
+
+<p>
+Test of flash cross-domain policy enforcement. Communication attempt *should* fail.
+</p>
+
+<input type="button" value="Click Me" onClick="doit();" />
+
+</body>
+</html>

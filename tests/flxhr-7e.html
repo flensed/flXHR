@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Demo #7e (jQuery Custom XHR Transport)</title>
+
+<script type="text/javascript" src="http://flxhr.flensed.com/code/build/flXHR.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js"></script>
+<script type="text/javascript" src="../build/thirdparty/jquery/jquery.flXHRproxy.js"></script>
+
+
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+This example demonstrates the jQuery plugin 'flXHRProxy', which uses the ajax prefilter from jQuery 1.5+.
+
+Each successive click of the button will fire off twice as many concurrent requests as the previous click, to demonstrate
+how the "instancePooling" feature re-uses previous instances when available.
+
+********************************************** */
+
+var usecount = 0;
+
+jQuery(document).ready(function() {
+	jQuery.flXHRproxy.registerOptions("http://test.getify.com/flXHR-tests/",{xmlResponseText:false,loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php"});
+});
+
+function doit() {
+	var count = (usecount+1);
+	for (var i=0; i<count; i++) {
+		var requestbody = "My name is jQuery-Test (#"+(++usecount)+")";
+		jQuery.ajaxSetup({error:handleError});
+		jQuery.post(
+			"http://test.getify.com/flXHR-tests/textme.php",
+			requestbody,
+			handleLoading
+		);
+	}
+}
+
+function handleLoading(data,status,jqXHR) {
+	var XHRobj = jqXHR.__flXHR__;
+	if (XHRobj.readyState == 4) {
+		alert("readyState:"+XHRobj.readyState
+			+"\nresponseText:"+XHRobj.responseText
+			+"\nstatus:"+XHRobj.status
+			+"\nstatusText:"+XHRobj.statusText
+			+"\nSource Object Id: "+XHRobj.instanceId
+		);
+	}
+}
+
+function handleError(jqXHR,errtype,errObj) {
+	var XHRobj = jqXHR.__flXHR__;
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+XHRobj.instanceId
+	);
+}
+
+</script>
+
+</head>
+
+<body>
+
+<p>
+This example demonstrates the jQuery plugin 'flXHRProxy', which uses the ajax prefilter from jQuery 1.5+.
+</p>
+<p>
+Each successive click of the button will fire off twice as many concurrent requests as the previous click, to demonstrate
+how the "instancePooling" feature re-uses previous instances when available.
+</p>
+
+<input type="button" value="Click Me" onClick="doit();" />
+
+</body>
+</html>

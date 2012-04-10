@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Demo #7b (Prototype)</title>
+
+<script language="Javascript" type="text/javascript" src="../build/thirdparty/prototype/prototype-1.6.0.3.js"></script>
+<script language="Javascript" type="text/javascript" src="../build/thirdparty/prototype/prototype.flXHRproxy.js"></script>
+
+
+<script language="Javascript" type="text/javascript" src="http://flxhr.flensed.com/code/build/flXHR.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+This example demonstrates the Prototype plugin 'flXHRproxy', which extends the core Ajax functions so that you can register 
+a URL (or partial URL) with a set of flXHR configuration options. When an Ajax call is made, if the URL matches a registered 
+URL, flXHR will be chosen as the transport and the options applied to the flXHR instance.
+
+Each successive click of the button will fire off twice as many concurrent requests as the previous click, to demonstrate
+how the "instancePooling" feature re-uses previous instances when available.
+
+********************************************** */
+
+
+Ajax.flXHRproxy.registerOptions("http://test.getify.com/flXHR-tests",{instancePooling:true,autoUpdatePlayer:true,xmlResponseText:false,loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php"});
+
+var usecount = 0;
+
+function doit() {
+	var count = (usecount+1);
+	for (var i=0; i<count; i++) {
+		var ar = new Ajax.Request("http://test.getify.com/flXHR-tests/textme.php", {
+			method: "post",
+			parameters: escape("My name is Prototype-Test (#"+(++usecount)+")"),
+			onSuccess: handleLoading,
+			onFailure: handleError,
+			onException: handleError
+		});
+	}
+}
+
+function handleLoading(prototypeObj) {
+	var XHRobj = prototypeObj.transport;
+	if (XHRobj.readyState == 4) {
+		alert("readyState:"+XHRobj.readyState
+			+"\nresponseText:"+XHRobj.responseText
+			+"\nstatus:"+XHRobj.status
+			+"\nstatusText:"+XHRobj.statusText
+			+"\nSource Object Id: "+XHRobj.instanceId
+		);
+		prototypeObj.transport = null;
+	}
+}
+
+function handleError(request,errObj) {
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+errObj.srcElement.instanceId
+	);
+}
+
+
+</script>
+
+
+</head>
+
+<body>
+
+<p>
+This example demonstrates the Prototype plugin 'flXHRProxy', which extends the core Ajax functions so that you can register 
+a URL (or partial URL) with a set of flXHR configuration options. When an Ajax call is made, if the URL matches a registered 
+URL, flXHR will be chosen as the transport and the options applied to the flXHR instance.
+</p>
+<p>
+Each successive click of the button will fire off twice as many concurrent requests as the previous click, to demonstrate
+how the "instancePooling" feature re-uses previous instances when available.
+</p>
+
+<input type="button" value="Click Me" onClick="doit();" /><br />
+
+</body>
+</html>

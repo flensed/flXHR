@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Demo #1</title>
+
+
+<script language="Javascript" type="text/javascript" src="../build/flXHR.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+flXHR can be instantiated during page load (in a script in the HEAD, for instance), and subsequent calls to it will be 
+queued (if necessary) and executed once the DOM and the flXHR object are ready. This example shows usage *without* an 
+error handler. If an error is encountered, a Javascript exception/error will be thrown instead, which your browser may 
+or may not report, depending on your configuration settings. 
+
+********************************************** */
+
+var flproxy = new flensed.flXHR({ autoUpdatePlayer:true, instanceId:"myproxy1", xmlResponseText:false, onreadystatechange:handleLoading, loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php" });
+flproxy.open("POST","http://test.getify.com/flXHR-tests/textme.php");
+flproxy.send("My name is "+flproxy.instanceId);
+
+function handleLoading(XHRobj) {
+	if (XHRobj.readyState == 4) {
+		alert("readyState:"+XHRobj.readyState
+			+"\nresponseText:"+XHRobj.responseText
+			+"\nstatus:"+XHRobj.status
+			+"\nstatusText:"+XHRobj.statusText
+			+"\nSource Object Id: "+XHRobj.instanceId
+		);
+	}
+}
+
+</script>
+
+</head>
+
+<body>
+
+<p>
+flXHR can be instantiated during page load (in a script in the HEAD, for instance), and subsequent calls to it will be 
+queued (if necessary) and executed once the DOM and the flXHR object are ready. This example shows usage *without* an 
+error handler. If an error is encountered, a Javascript exception/error will be thrown instead, which your browser may 
+or may not report, depending on your configuration settings. 
+</p>
+<p>
+Request sent, please wait for the response alert.
+</p>
+
+</body>
+</html>

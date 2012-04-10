@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Demo #8b</title>
+
+
+<script language="Javascript" type="text/javascript" src="../build/flXHR.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+This example demonstrates receiving a big (> 65k) text/binary content as a response. 
+
+********************************************** */
+
+var flproxy = new flensed.flXHR({ autoUpdatePlayer:true, xmlResponseText:false, instanceId:"myproxy1", onerror:handleError, onreadystatechange:handleLoading, loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php" });
+var flproxy2 = new flensed.flXHR({ autoUpdatePlayer:true, binaryResponseBody:true, xmlResponseText:false, instanceId:"myproxy2", onerror:handleError, onreadystatechange:handleLoading, loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php" });
+
+function doit() {
+	document.getElementById("myval").innerHTML = "";
+	flproxy.open("POST","http://test.getify.com/flXHR-tests/bigtextme.php");
+	flproxy.send(null);
+}
+
+function doit2() {
+	document.getElementById("myval").innerHTML = "";
+	flproxy2.open("POST","http://test.getify.com/flXHR-tests/bigtextme.php");
+	flproxy2.send(null);
+}
+
+function doit3() {
+	document.getElementById("myval").innerHTML = "";
+	flproxy.open("POST","http://test.getify.com/flXHR-tests/textme.php");
+	flproxy.send("my name is test");
+}
+
+function doit4() {
+	document.getElementById("myval").innerHTML = "";
+	flproxy2.open("POST","http://test.getify.com/flXHR-tests/textme.php");
+	flproxy2.send("my name is test");
+}
+
+function handleLoading(XHRobj) {
+	if (XHRobj.readyState == 4) {
+		document.getElementById("myval").innerHTML = XHRobj.responseText;
+	}
+}
+
+function handleLoading2(XHRobj) {
+	if (XHRobj.readyState == 4) {		
+		var txt = flensed.binaryToString(XHRobj.responseBody);
+		document.getElementById("myval").innerHTML = txt;
+	}
+}
+
+function handleError(errObj) {
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+errObj.srcElement.instanceId
+	);
+}
+
+</script>
+
+</head>
+
+<body>
+
+<p>
+This example demonstrates receiving a big (> 65k) text/binary content as a response.
+</p>
+
+<input type="button" value="Click Me (BIG Text)" onClick="doit();" /><br />
+<input type="button" value="Click Me (BIG Binary)" onClick="doit2();" /><br />
+<input type="button" value="Click Me (SMALL Text)" onClick="doit3();" /><br />
+<input type="button" value="Click Me (SMALL Binary)" onClick="doit4();" /><br />
+
+<div id="myval"></div>
+
+</body>
+</html>

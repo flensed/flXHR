@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Demo #2a</title>
+
+
+<script language="Javascript" type="text/javascript" src="http://1.flensed.2static.it/code/build/flXHR.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+flXHR can also be instantiated during page load (in a script in the HEAD, for instance), but used later, in response 
+to a user action, for intance. This example also shows how the user can use the object more than once, and in this 
+simple case where the configuration doesn't change, there is no need to even reset the object. This example also 
+defines an error handler in case an error occurs. 
+
+********************************************** */
+
+var flproxy = new flensed.flXHR({ autoUpdatePlayer:true, instanceId:"myproxy1", xmlResponseText:false, onerror:handleError, onreadystatechange:handleLoading, loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php" });
+var usecount = 0;
+
+function doit() {
+	flproxy.open("POST","http://test.getify.com/flXHR-tests/textme.php");
+	flproxy.send("My name is "+flproxy.instanceId+" (#"+(++usecount)+")");
+}
+
+function handleLoading(XHRobj) {
+	if (XHRobj.readyState == 4) {
+		alert("readyState:"+XHRobj.readyState
+			+"\nresponseText:"+XHRobj.responseText
+			+"\nstatus:"+XHRobj.status
+			+"\nstatusText:"+XHRobj.statusText
+			+"\nSource Object Id: "+XHRobj.instanceId
+		);
+	}
+}
+
+function handleError(errObj) {
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+errObj.srcElement.instanceId
+	);
+}
+
+</script>
+
+</head>
+
+<body>
+
+<p>
+flXHR can also be instantiated during page load (in a script in the HEAD, for instance), but used later, in response 
+to a user action, for intance. This example also shows how the user can use the object more than once, and in this 
+simple case where the configuration doesn't change, there is no need to even reset the object. This example also 
+defines an error handler in case an error occurs. 
+</p>
+
+<input type="button" value="Click Me" onClick="doit();" />
+
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flensed Test Suites</title>
+
+<script language="Javascript" type="text/javascript" src="/code/build/thirdparty/jquery-1.2.6.js"></script>
+<script language="Javascript" type="text/javascript" src="/code/build/thirdparty/jquery.dimensions.min.js"></script>
+
+<style>
+body { margin:0px; padding:0px; }
+</style>
+
+
+<script language="javascript">
+var testsuites = {};
+testsuites['CheckPlayer'] = [];
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-1.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-2.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-3.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-4.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-5.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-6.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-6b.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-6c.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-6d.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-7.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-7b.html");
+testsuites['CheckPlayer'].push("http://checkplayer.flensed.com/code/tests/checkplayer-7c.html");
+
+testsuites['flXHR'] = [];
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-0.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-1.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-2.html");
+testsuites['flXHR'].push("http://www.flensed.com/code/tests/flxhr-2b.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-2b.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-3.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-4.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-5.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-6.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-7.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-7b.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-7c.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-7d.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-7e.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-7f.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-7g.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-8.html");
+testsuites['flXHR'].push("http://flxhr.flensed.com/code/tests/flxhr-8b.html");
+</script>
+
+<script language="javascript">
+
+var testIdx = 0;
+
+function loadSuites() {
+	var theForm = document.forms['runsuite'];
+	var suiteList = theForm.elements['suiteList'];
+	for (var k in testsuites) {
+		if (typeof testsuites[k] === 'object' && testsuites[k].length > 0) {
+			suiteList.options[suiteList.options.length] = new Option(k,k);
+		}
+	}
+	resizeFrame();
+	bindEvent(window,"onresize",resizeFrame);
+	bindEvent(window,"onunload",function(){try{window.detachEvent("onresize",resizeFrame)}catch(err){}});
+}
+function nextTest() {
+	var theForm = document.forms['runsuite'];
+	var whichSuite = theForm.elements["suiteList"].options[theForm.elements["suiteList"].selectedIndex].value;
+	if (testIdx<testsuites[whichSuite].length) {
+		var theFrame = getObjectById("testFrame");
+		theFrame.src = testsuites[whichSuite][testIdx];
+		theForm.elements["currentTest"].value = "#"+(testIdx+1)+": "+testsuites[whichSuite][testIdx];
+		testIdx++;
+		return true;
+	}
+	else {
+		alert("Tests Done!");
+		return false;
+	}
+}
+function startSuite(theForm) {
+	if (theForm.elements["suiteList"].selectedIndex > 0) {
+		theForm.elements["suiteList"].disabled = true;
+		theForm.elements["btnStart"].disabled = true;
+		theForm.elements["btnReset"].disabled = false;
+		theForm.elements["btnPass"].disabled = false;
+		theForm.elements["btnFail"].disabled = false;
+		
+		nextTest();
+	}
+}
+function resetSuite(theForm) {
+	testIdx = 0;
+	theForm.elements["suiteList"].disabled = false;
+	theForm.elements["btnStart"].disabled = false;
+	theForm.elements["btnReset"].disabled = true;
+	theForm.elements["btnPass"].disabled = true;
+	theForm.elements["btnFail"].disabled = true;
+	theForm.elements["currentTest"].value = "";
+	getObjectById("testFrame").src = "";
+}
+function addToLog(theForm,entry) {
+	var theLog = theForm.elements["testlog"];
+	theLog.options[theLog.options.length] = new Option(entry,"");
+	setTimeout(function(){theLog.selectedIndex = (theLog.options.length-1);},10);
+}
+function testPassed(theForm) {
+	var testname = theForm.elements["currentTest"].value;
+	var whichSuite = theForm.elements["suiteList"].options[theForm.elements["suiteList"].selectedIndex].value;
+	addToLog(theForm,"Pass. ("+whichSuite+") "+testname);
+	if (!nextTest()) resetSuite(theForm);
+}
+function testFailed(theForm) {
+	var testname = theForm.elements["currentTest"].value;
+	var whichSuite = theForm.elements["suiteList"].options[theForm.elements["suiteList"].selectedIndex].value;
+	addToLog(theForm,"Fail! ("+whichSuite+") "+testname);
+	if (!nextTest()) resetSuite(theForm);
+}
+function clearLog(theForm) {
+	var theLog = theForm.elements["testlog"];
+	theLog.selectedIndex = -1;
+	theLog.options.length = 0;
+}
+function bindEvent(obj,eventName,handlerFunc) {
+	eventName = eventName.toLowerCase();
+	if (typeof obj.addEventListener !== "undefined") { obj.addEventListener(eventName.replace(/^on/,""),handlerFunc,false); }
+	else if (typeof obj.attachEvent !== "undefined") { obj.attachEvent(eventName,handlerFunc); }
+	else if (typeof obj[eventName] === "function") {
+		var oldHandler = obj[eventName];
+		obj[eventName] = function() {
+			oldHandler();
+			handlerFunc();
+		};
+	}
+	else { obj[eventName] = handlerFunc; }
+}
+function getObjectById(idStr) {
+	try {
+		if (document.layers) { return document.layers[idStr]; }
+		else if (document.all) { return document.all[idStr]; }
+		else if (document.getElementById) { return document.getElementById(idStr); }
+	}
+	catch (err) { }
+	return null;
+}
+
+function resizeFrame() {
+	var controlsHeight = $('#controls').height();
+	var controlsWidth = $('#controls').width();
+	var winHeight = $(window).height();
+	var winWidth = $(window).width();
+	
+	var frameDimDiff = $('#testFrame').outerWidth() - $('#testFrame').width();
+	
+	if (winWidth-controlsWidth-frameDimDiff<0) $('#testFrame').width(controlsWidth-frameDimDiff);
+	else $('#testFrame').width(winWidth-frameDimDiff);
+
+	if (winHeight-controlsHeight-frameDimDiff<300) $('#testFrame').height(300);
+	else $('#testFrame').height(winHeight-controlsHeight-frameDimDiff);
+}
+</script>
+
+</head>
+
+<body onLoad="loadSuites();">
+
+<div id="controls" style="width:900px;height:125px;">
+	<br />
+	<center>
+	<form name="runsuite">
+	<table cellpadding="0" cellspacing="5" border="0">
+	<tr>
+		<td align="left" valign="top" width="20%">
+			<select name="suiteList">
+				<option value="">--select Test Suite--</option>
+			</select>
+		</td>
+		<td align="left" valign="top" rowspan="3" width="40%">
+			<nobr>Test: <input name="currentTest" value="" READONLY size="40" /></nobr>
+		</td>
+		<td align="left" valign="top" rowspan="3" width="40%">
+			<nobr>Log: <select name="testlog" size="4" style="width:400px;" READONLY></select></nobr><br />
+			<input type="button" name="clearlog" value="Clear Log" onClick="clearLog(this.form);" />
+		</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">
+			<input type="button" name="btnStart" value="Start" onClick="startSuite(this.form);" />&nbsp;
+			<input type="button" name="btnReset" value="Reset" onClick="resetSuite(this.form);" DISABLED />
+		</td>
+	</tr>
+	<tr>
+		<td align="left" valign="top">
+			<input type="button" name="btnPass" value="Pass" onClick="testPassed(this.form);" DISABLED />&nbsp;
+			<input type="button" name="btnFail" value="Fail" onClick="testFailed(this.form);" DISABLED />
+		</td>
+	</tr>
+	</table>
+	</form>
+	</center>
+</div>
+<iframe id="testFrame" name="testFrame" style="width:10px;height:10px;"></iframe>
+
+</body>
+</html>

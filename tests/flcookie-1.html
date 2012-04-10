@@ -1,0 +1,158 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flCookie Demo #1</title>
+
+
+<script type="text/javascript">var flensed={base_path:"../build/"};</script>
+<script type="text/javascript" src="../dev/flCookie.js"></script>
+
+<script type="text/javascript">
+
+/* *******************************************
+
+flCookie is used to set persistent cookies across domains, sub-domains, multiple browser instances, and even different browsers.
+
+********************************************** */
+
+var cookies = {};
+
+function doCookieAction(cookieLocation,cookieNameSuffix,doAction) {
+	var cookieidentity = cookieLocation+"_"+cookieNameSuffix
+	if (typeof cookies[cookieidentity] === "undefined") {
+		var cookie = new flensed.flCookie(
+			cookieLocation,
+			cookieNameSuffix,
+			function(cookie){
+				cookieReady(cookieidentity);
+			},
+			cookieError
+		);
+		cookies[cookieidentity] = {cookieObj:cookie, doActions:[doAction]};
+	}
+	else if (cookies[cookieidentity]["doActions"] !== null) {
+		cookies[cookieidentity]["doActions"].push(doAction);
+	}
+	else {
+		doAction(cookies[cookieidentity]["cookieObj"]);
+	}
+}
+
+function cookieReady(cookieidentity) {
+	for (var i=0; i<cookies[cookieidentity]["doActions"].length; i++) {
+		cookies[cookieidentity]["doActions"][i](cookies[cookieidentity]["cookieObj"]);
+	}
+	cookies[cookieidentity]["doActions"] = null;
+}
+
+
+function setValueInCookie(theForm) {
+	var cookieLocation = theForm.elements["cookieLocation"].options[theForm.elements["cookieLocation"].selectedIndex].value,
+		cookieNameSuffix = theForm.elements["cookieNameSuffix"].value,
+		varName = theForm.elements["varName"].value,
+		varValue = theForm.elements["varValue"].value
+	;
+	if (varName == "") {
+		alert("Specify a variable name to set in the cookie.");
+	}
+	else {
+		doCookieAction(cookieLocation,cookieNameSuffix,function(cookie) {
+			var success = cookie.setValue(varName,varValue,"Dec 31, 2009");
+			if (success) {
+				alert("Cookie ('"+cookieNameSuffix+"' @ "+cookieLocation+"), '"+varName+"' set to '"+varValue+"' successfully!");
+			}
+			else {
+				alert("Cookie ('"+cookieNameSuffix+"' @ "+cookieLocation+"), '"+varName+"' *not* set to '"+varValue+"'.");
+			}
+		});
+	}
+}
+
+function getValueFromCookie(theForm) {
+	var cookieLocation = theForm.elements["cookieLocation"].options[theForm.elements["cookieLocation"].selectedIndex].value,
+		cookieNameSuffix = theForm.elements["cookieNameSuffix"].value,
+		varName = theForm.elements["varName"].value
+	;
+	if (varName == "") {
+		alert("Specify a variable name to get from the cookie.");
+	}
+	else {
+		doCookieAction(cookieLocation,cookieNameSuffix,function(cookie) {
+			var val = null;
+			try { val = cookie.getValue(varName); } catch (err) {}
+			alert("'"+varName+"' from cookie ('"+cookieNameSuffix+"' @ "+cookieLocation+"): "+val);
+		});
+	}
+}
+
+function deleteValueFromCookie(theForm) {
+	var cookieLocation = theForm.elements["cookieLocation"].options[theForm.elements["cookieLocation"].selectedIndex].value,
+		cookieNameSuffix = theForm.elements["cookieNameSuffix"].value,
+		varName = theForm.elements["varName"].value
+	;
+	if (varName == "") {
+		alert("Specify a variable name to delete from the cookie.");
+	}
+	else {
+		doCookieAction(cookieLocation,cookieNameSuffix,function(cookie) {
+			var success = cookie.deleteValue(varName);
+			if (success) {
+				alert("Cookie ('"+cookieNameSuffix+"' @ "+cookieLocation+"), '"+varName+"' deleted successfully!");
+			}
+			else {
+				alert("Cookie ('"+cookieNameSuffix+"' @ "+cookieLocation+"), '"+varName+"' *not* deleted.");
+			}
+		});
+	}
+}
+
+
+function cookieError(errObj) {
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+errObj.srcElement.instanceId
+	);
+}
+
+</script>
+
+</head>
+
+<body>
+
+<p>
+flCookie is used to set persistent cookies across domains, sub-domains, multiple browser instances, and even different browsers.
+</p>
+
+<form name="cookiesetter">
+
+Cookie Location:<br />
+<select name="cookieLocation">
+	<option value="http://www.flensed.com/code/dev/">http://www.flensed.com/code/dev/</option>
+	<option value="http://test.getify.com/flCookie-tests/">http://test.getify.com/flCookie-tests/</option>
+	<option value="http://flcookie.flensed.com/code/dev/">http://flcookie.flensed.com/code/dev/</option>
+</select>
+<br />
+<br />
+Cookie Name Suffix (optional):<br />
+<input name="cookieNameSuffix" value="" />
+<br />
+<br />
+Variable Name:<br />
+<input name="varName" value="" />
+<br />
+<br />
+Variable Value (to set):<br />
+<input name="varValue" value="" />
+<br />
+<br />
+<input type="button" value="Set value in cookie" onclick="setValueInCookie(this.form);" />&nbsp;
+<input type="button" value="Get value from cookie" onclick="getValueFromCookie(this.form);" />&nbsp;
+<input type="button" value="Delete value from cookie" onclick="deleteValueFromCookie(this.form);" />
+
+</form>
+
+</body>
+</html>

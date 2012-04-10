@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Demo #7d (ExtJS v3)</title>
+
+<script language="javascript" src="../build/thirdparty/ext3/ext-core.js"></script>
+<script language="javascript" src="../build/thirdparty/ext3/ext-base-ajax-min.js"></script>
+
+
+<script language="Javascript" type="text/javascript" src="../build/flXHR.js"></script>
+
+<script language="javascript">
+
+/* *******************************************
+
+This example demonstrates a very basic proof-of-concept of how to adapt ExtJS framework to use flXHR instead of its 
+other XHR (and workaround) methods. The basic concept is that ExtJS has a "factory" function which gives it a new XHR 
+object to use for each request. If you overwrite the default ExtJS method with a function that instead instantiates a 
+new flXHR object (or returns an existing reusable one) each time, then ExtJS will not know the difference, because 
+flXHR is compatible with the native XHR API. This example is by no means a "best practice" on how to integrate 
+flXHR with ExtJS, as there may be other efficient ways of accomplishing the integration tasks. 
+
+Each successive click of the button will fire off twice as many concurrent requests as the previous click, to demonstrate
+how the "instancePooling" feature re-uses previous instances when available.
+
+********************************************** */
+
+var usecount = 0;
+
+function adaptEXT() {
+	Ext.lib.Ajax.createXhrObject = function(transId) {
+		var obj = new flensed.flXHR({instancePooling:true,autoUpdatePlayer:true,xmlResponseText:false,onerror:handleError,loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php"});
+		return { conn:obj, tId:transId };
+	}
+	Ext.lib.Ajax.old_createResponseObject = Ext.lib.Ajax.createResponseObject;
+	Ext.lib.Ajax.createResponseObject = function(o,callbackArg) {
+		var obj = Ext.lib.Ajax.old_createResponseObject(o,callbackArg);
+		obj.XHRobj = o.conn;
+		return obj;
+	}
+	Ext.lib.Ajax.releaseObject = function(o) {
+		o.conn = null;
+		o = null;
+	}
+	
+	conn = new Ext.data.Connection();
+}
+
+function doit() {
+	var count = (usecount+1);
+	for (var i=0; i<count; i++) {
+		var conn = new Ext.data.Connection();
+		conn.request({
+			url: 'http://test.getify.com/flXHR-tests/textme.php',
+			method: 'POST',
+			params: { val:"My name is EXT-Test (#"+(++usecount)+")" },
+			success: handleLoading,
+			failure: handleError
+		});
+	}
+}
+
+function handleLoading(responseObj) {
+	var XHRobj = responseObj.XHRobj;
+	if (XHRobj.readyState == 4) {
+		alert("readyState:"+XHRobj.readyState
+			+"\nresponseText:"+XHRobj.responseText
+			+"\nstatus:"+XHRobj.status
+			+"\nstatusText:"+XHRobj.statusText
+			+"\nSource Object Id: "+XHRobj.instanceId
+		);
+
+		responseObj.XHRobj = null;
+	}
+}
+
+function handleError(errObj) {
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+errObj.srcElement.instanceId
+	);
+}
+
+
+</script>
+
+
+</head>
+
+<body onload="adaptEXT()">
+
+<p>
+This example demonstrates a very basic proof-of-concept of how to adapt ExtJS framework to use flXHR instead of its 
+other XHR (and workaround) methods. The basic concept is that ExtJS has a "factory" function which gives it a new XHR 
+object to use for each request. If you overwrite the default ExtJS method with a function that instead instantiates a 
+new flXHR object (or returns an existing reusable one) each time, then ExtJS will not know the difference, because 
+flXHR is compatible with the native XHR API. This example is by no means a "best practice" on how to integrate 
+flXHR with ExtJS, as there may be other efficient ways of accomplishing the integration tasks. 
+</p>
+<p>
+Each successive click of the button will fire off twice as many concurrent requests as the previous click, to demonstrate
+how the "instancePooling" feature re-uses previous instances when available.
+</p>
+
+<input type="button" value="Click Me" onClick="doit()" /><br />
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Demo #2b</title>
+
+
+<script language="Javascript" type="text/javascript" src="http://flxhr.flensed.com/code/build/flXHR.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+The standard security model that Flash uses for checking domains against server policies for allowing cross-domain communication
+involves checking only that the server policy authorizes the SWF-domain (where the flXHR.swf comes from), for both communication
+and for headers. 
+
+However, for some complicated reasons (described in detail here: http://www.flensed.com/fresh/2008/08/adobe-flash-player-security-hole/ ),
+it is believed that this security authorization model is lacking in only looking at the SWF-domain, when considering that the page-domain 
+(the domain in the address bar of your browser) can differ from the SWF-domain, in that anyone who hosts a SWF file like flXHR.swf on their 
+domain (SWF-domain) has no control over another (possibly malicious) page linking to and using it in a different page-domain. Since flXHR.swf 
+by necessity exposes a great deal of control to the calling page's Javascript, the page that flXHR runs in is equally as important to authorize 
+as the domain that flXHR.swf comes from.
+
+As such, flXHR enforces more strictness in the policy checking phase, by enforcing that both page-domain and SWF-domain must be
+found to be authorized in the server policy. If not, the communication attempt fails as a 'security sandbox violation'.
+
+This example demonstrates the dual checking of domains. The example (like all others) attempts to communicate with 'test.getify.com/flXHR-tests'. The policy
+on that server allows only for 'flxhr.flensed.com' authorization, meaning that both SWF-domain and page-domain must match that for flXHR to work.
+If you look at the source for this page, flXHR.js is linked absolutely from 'flxhr.flensed.com', so the SWF-domain will always pass. However, this page
+can be viewed either under 'www.flensed.com' or 'flxhr.flensed.com'. If you view the page with 'www.flensed.com', the communication will
+be blocked because of the server policy. If you switch to 'flxhr.flensed.com' as the page-domain, the communication will work properly as expected.
+
+********************************************** */
+
+var flproxy = new flensed.flXHR({ autoUpdatePlayer:true, instanceId:"myproxy1", xmlResponseText:false, onerror:handleError, onreadystatechange:handleLoading, loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php" });
+var usecount = 0;
+
+function doit() {
+	flproxy.open("POST","http://test.getify.com/flXHR-tests/textme.php");
+	flproxy.send("My name is "+flproxy.instanceId+" (#"+(++usecount)+")");
+}
+
+function handleLoading(XHRobj) {
+	if (XHRobj.readyState == 4) {
+		alert("readyState:"+XHRobj.readyState
+			+"\nresponseText:"+XHRobj.responseText
+			+"\nstatus:"+XHRobj.status
+			+"\nstatusText:"+XHRobj.statusText
+			+"\nSource Object Id: "+XHRobj.instanceId
+		);
+	}
+}
+
+function handleError(errObj) {
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+errObj.srcElement.instanceId
+	);
+}
+
+</script>
+
+</head>
+
+<body>
+
+<p>
+The standard security model that Flash uses for checking domains against server policies for allowing cross-domain communication
+involves checking only that the server policy authorizes the SWF-domain (where the flXHR.swf comes from), for both communication
+and for headers. 
+</p>
+<p>
+However, for some complicated reasons (described in detail <a href="http://www.flensed.com/fresh/2008/08/adobe-flash-player-security-hole/" target="_blank">here</a>),
+it is believed that this security authorization model is lacking in only looking at the SWF-domain, when considering that the page-domain 
+(the domain in the address bar of your browser) can differ from the SWF-domain, in that anyone who hosts a SWF file like flXHR.swf on their 
+domain (SWF-domain) has no control over another (possibly malicious) page linking to and using it in a different page-domain. Since flXHR.swf 
+by necessity exposes a great deal of control to the calling page's Javascript, the page that flXHR runs in is equally as important to authorize 
+as the domain that flXHR.swf comes from.
+</p>
+<p>
+As such, flXHR enforces more strictness in the policy checking phase, by enforcing that both page-domain and SWF-domain must be
+found to be authorized in the server policy. If not, the communication attempt fails as a 'security sandbox violation'.
+</p>
+<p>
+This example demonstrates the dual checking of domains. The example (like all others) attempts to communicate with 'test.getify.com/flXHR-tests'. The policy
+on that server allows only for 'flxhr.flensed.com' authorization, meaning that both SWF-domain and page-domain must match that for flXHR to work.
+If you look at the source for this page, flXHR.js is linked absolutely from 'flxhr.flensed.com', so the SWF-domain will always pass. However, this page
+can be viewed either under 'www.flensed.com' or 'flxhr.flensed.com'. If you view the page with 'www.flensed.com', the communication will
+be blocked because of the server policy. If you switch to 'flxhr.flensed.com' as the page-domain, the communication will work properly as expected.
+</p>
+
+<input type="button" value="Click Me" onClick="doit();" />
+
+</body>
+</html>

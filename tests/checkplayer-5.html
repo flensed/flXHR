@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CheckPlayer Demo #5</title>
+
+<script language="Javascript" type="text/javascript" src="../build/checkplayer.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+This demo illustrates the same behavior as Demo #4, but with no queue'd call to DoSWF(), but instead it is called from the
+checkCB() callback if the version check passes.
+
+********************************************** */
+
+function Check() {
+	var check = new flensed.checkplayer("9.0.115",checkCB,true,updateCB);
+}
+
+function checkCB(checkObj) {
+	if (checkObj.checkPassed) {
+		var flashvars = {};
+		var params = {wmode:"transparent", allowScriptAccess:"always", menu:"false", scale:"noscale"};
+		var attributes = { id:"myswf", name:"myswf" };
+
+		// this call won't have to be queued because the library and plugin version are ok
+		checkObj.DoSWF("../build/sample.swf", "mycontent", "460", "85", flashvars, params, attributes);
+	}
+}
+
+function updateCB(checkObj) {
+	if (checkObj.updateStatus == flensed.checkplayer.UPDATE_CANCELED) {
+		alert("Update canceled.");
+	}
+	else if (checkObj.updateStatus == flensed.checkplayer.UPDATE_FAILED) {
+		alert("Update failed. Current version detected:"+checkObj.playerVersionDetected);
+	}
+}
+
+
+</script>
+
+</head>
+
+<body>
+
+<input type="button" value="Get SWF" onclick="Check();" />
+<br /><br />
+<div id="mycontent"></div>
+
+<p>
+	This demo illustrates the same behavior as Demo #4, but with no queue'd call to DoSWF(), but instead it is called from the
+	checkCB() callback if the version check passes.
+</p>
+</body>
+</html>

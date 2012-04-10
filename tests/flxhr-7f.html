@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>flXHR Demo #7f (native XHR)</title>
+
+
+<script language="Javascript" type="text/javascript" src="../build/flXHR.js"></script>
+
+<script language="javascript">
+
+/* *******************************************
+
+This demo is a proof-of-concept of how the low-level native XHR object in the browser itself can be overwritten with a
+a function that instead returns a new flXHR instance. This method is probably the best option if the framework you are
+choosing to try and integrate flXHR with is for some reason not able to provide an easy way to override the transport
+layer with a flXHR instance. All the framework examples shown previously could have been done like this, but those frameworks
+had a slightly more direct (and hopefully better) way of doing the adaptation, so they are probably the better approach.
+Use this method shown here at your own risk, as it's a bit more brute force than the others.
+
+Each successive click of the button will fire off twice as many concurrent requests as the previous click, to demonstrate
+how the "instancePooling" feature re-uses previous instances when available.
+
+********************************************** */
+
+var usecount = 0;
+
+function adaptNative() {
+	// literally redefine the native XHR object here, making flXHR quite literally a drop-in replacement!
+	XMLHttpRequest = function() {
+		return new flensed.flXHR({ instancePooling:true,autoUpdatePlayer:true,xmlResponseText:false,onerror:handleError,onreadystatechange:handleLoading,loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php" });
+	}
+	// IE only, for the IE specific XHR code instantiation
+	try {
+		if (window.ActiveXObject) {
+			var old_ActiveXObject = window.ActiveXObject;
+			window.ActiveXObject = function(typeStr) {
+				if (typeStr === "Microsoft.XMLHTTP") { return new flensed.flXHR({ instancePooling:true,autoUpdatePlayer:true,xmlResponseText:false,onerror:handleError, onreadystatechange:handleLoading,loadPolicyURL:"http://test.getify.com/flXHR-tests/policy.php" }); }
+				else { return new old_ActiveXObject(typeStr); }
+			}
+		}
+	}
+	catch (err) { }
+}
+
+function doit() {
+	var count = (usecount+1);
+	for (var i=0; i<count; i++) {
+		// since the native object has been redefined, when we instantiate XHR here, we'll get flXHR instead!
+		var flproxy = (window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest());
+		flproxy.open("POST","http://test.getify.com/flXHR-tests/textme.php");
+		flproxy.send("My name is native-Test (#"+(++usecount)+")");
+	}
+}
+
+function handleLoading(XHRobj) {
+	if (XHRobj.readyState == 4) {
+		alert("readyState:"+XHRobj.readyState
+			+"\nresponseText:"+XHRobj.responseText
+			+"\nstatus:"+XHRobj.status
+			+"\nstatusText:"+XHRobj.statusText
+			+"\nSource Object Id: "+XHRobj.instanceId
+		);
+	}
+}
+
+function handleError(errObj) {
+	alert("Error: "+errObj.number
+		+"\nType: "+errObj.name
+		+"\nDescription: "+errObj.description
+		+"\nSource Object Id: "+errObj.srcElement.instanceId
+	);
+}
+
+
+</script>
+
+
+</head>
+
+<body onload="adaptNative()">
+
+<p>
+This demo is a proof-of-concept of how the low-level native XHR object in the browser itself can be overwritten with a
+a function that instead returns a new flXHR instance. This method is probably the best option if the framework you are
+choosing to try and integrate flXHR with is for some reason not able to provide an easy way to override the transport
+layer with a flXHR instance. All the framework examples shown previously could have been done like this, but those frameworks
+had a slightly more direct (and hopefully better) way of doing the adaptation, so they are probably the better approach.
+<b>Use this method shown here at your own risk</b>, as it's a bit more brute force than the others.
+</p>
+<p>
+Each successive click of the button will fire off twice as many concurrent requests as the previous click, to demonstrate
+how the "instancePooling" feature re-uses previous instances when available.
+</p>
+
+<input type="button" value="Click Me" onClick="doit()" />
+
+</body>
+</html>

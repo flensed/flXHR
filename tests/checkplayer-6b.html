@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CheckPlayer Demo #6b</title>
+
+<script language="Javascript" type="text/javascript" src="../build/checkplayer.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+These demos illustrate the 'targetElem' parameter (formerly 'replaceElemIdStr') to DoSWF, the callback functionality, and the SWFObject "Alternate Content"
+functionality, which replaces the alternate content with the SWF.
+
+Demo 'b' shows an alternate syntax for the behavior of demo 'a', with an object and a key called 'replaceId' with the string as the Id of the DOM object to replace with the SWF.
+
+Note: To prevent any flicker effect where the "Alternate Content" is shown briefly before being replaced, this demo
+shows how the alternate content can initially be hidden, and then shown only if the SWF fails to load, according to the callbacks.
+You can test this by saying "No" to the question of if you want to install the update. Also, the DoSWFCB() shows the flash content once 
+the SWF content starts loading (so as to make your SWF preloader visible, for instance), and it displays an alert when it completes.
+
+********************************************** */
+
+var check = new flensed.checkplayer("9.0.115",checkCB,true,updateCB);
+
+function checkCB(checkObj) {
+	if (checkObj.checkPassed) {
+		var flashvars = {};
+		var params = {wmode:"transparent", allowScriptAccess:"always", menu:"false", scale:"noscale"};
+		var attributes = { id:"myswf", name:"myswf" };
+
+		checkObj.DoSWF("../build/sample.swf", {replaceId:"mycontent"}, "460", "85", flashvars, params, attributes, DoSWFCB);
+	}
+}
+
+function updateCB(checkObj) {
+	if (checkObj.updateStatus == flensed.checkplayer.UPDATE_CANCELED) {
+		flensed.getObjectById("mycontent").style.visibility = "visible";
+		alert("Update canceled.");
+	}
+	else if (checkObj.updateStatus == flensed.checkplayer.UPDATE_FAILED) {
+		flensed.getObjectById("mycontent").style.visibility = "visible";
+		alert("Update failed. Current version detected:"+checkObj.playerVersionDetected);
+	}
+}
+
+function DoSWFCB(loadStatus) {
+	if (loadStatus.status == flensed.checkplayer.SWF_LOADING) {
+		loadStatus.srcElem.style.visibility = "visible";
+	}
+	if (loadStatus.status == flensed.checkplayer.SWF_LOADED) {
+		alert("SWF:"+loadStatus.srcId+" Loaded Successfully!");
+	}
+}
+
+</script>
+
+</head>
+
+<body>
+
+<br /><br />
+
+<p>Text before the alt content.</p>
+<div id="mycontent" style="visibility:hidden;width:460px;height:85px;">This is alternate content for when the SWF cannot be shown because of a plugin installation or version issue. This text should be replaced by the SWF.</div>
+<p>Text after the alt content.</p>
+
+<p>
+	These demos illustrate the 'targetElem' parameter (formerly 'replaceElemIdStr') to DoSWF, the callback functionality, and the SWFObject "Alternate Content"
+	functionality, which replaces the alternate content with the SWF.
+</p>
+<p>
+	Demo 'b' shows an alternate syntax for the behavior of demo 'a', with an object and a key called 'replaceId' with the string as the Id of the DOM object to replace with the SWF.
+</p>
+<p>
+	<b>Note:</b> To prevent any flicker effect where the "Alternate Content" is shown briefly before being replaced, this demo
+	shows how the alternate content can initially be hidden, and then shown only if the SWF fails to load, according to the callbacks.
+	You can test this by saying "No" to the question of if you want to install the update. Also, the DoSWFCB() shows the flash content once 
+	the SWF content starts loading (so as to make your SWF preloader visible, for instance), and it displays an alert when it completes.
+</p>
+</body>
+</html>

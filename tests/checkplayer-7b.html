@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CheckPlayer Demo #7b</title>
+
+<script language="Javascript" type="text/javascript" src="../build/checkplayer.js"></script>
+
+<script language="Javascript" type="text/javascript">
+
+/* *******************************************
+
+These demos illustrate the 'options' parameter (formerly 'DoSWFCallback') to DoSWF.
+
+Demo 'b' shows the 'swfTimeout' property, which specifies a number of milliseconds (in this demo, only 1, to ensure it fires) to wait after starting the SWF embed for it
+to start downloading. When the timeout fires, the swfCB callback is notified with the SWF_TIMEOUT event status value.
+
+********************************************** */
+
+var check = new flensed.checkplayer("9.0.115",checkCB,true,updateCB);
+
+function cachebreak() {
+	return (new Date()).getTime();
+}
+
+function checkCB(checkObj) {
+	if (checkObj.checkPassed) {
+		var flashvars = {};
+		var params = {wmode:"transparent", allowScriptAccess:"always", menu:"false", scale:"noscale"};
+		var attributes = { id:"myswf", name:"myswf" };
+		var swfoptions = { swfCB:DoSWFCB, swfTimeout:1 };
+
+		checkObj.DoSWF("../build/sample.swf?"+cachebreak(), {appendToId:"mycontent"}, "460", "85", flashvars, params, attributes, swfoptions);
+	}
+}
+
+function updateCB(checkObj) {
+	if (checkObj.updateStatus == flensed.checkplayer.UPDATE_CANCELED) {
+		flensed.getObjectById("mycontent").style.visibility = "visible";
+		alert("Update canceled.");
+	}
+	else if (checkObj.updateStatus == flensed.checkplayer.UPDATE_FAILED) {
+		flensed.getObjectById("mycontent").style.visibility = "visible";
+		alert("Update failed. Current version detected:"+checkObj.playerVersionDetected);
+	}
+}
+
+function DoSWFCB(loadStatus) {
+	if (loadStatus.status == flensed.checkplayer.SWF_LOADING) {
+		loadStatus.srcElem.style.visibility = "visible";
+	}
+	else if (loadStatus.status == flensed.checkplayer.SWF_LOADED) {
+		alert("SWF:"+loadStatus.srcId+" Loaded Successfully!");
+	}
+	else if (loadStatus.status == flensed.checkplayer.SWF_TIMEOUT) {
+		flensed.getObjectById("mycontent").style.visibility = "visible";
+		alert("SWF:"+loadStatus.srcId+" failed to start loading in a timely manner.");
+	}
+}
+
+</script>
+
+</head>
+
+<body>
+
+<br /><br />
+
+<p>
+	<b>Note: In some browsers, if you've run the other demos/tests, you may need to clear you cache and reload this page to see that the very short timeout is enough to catch that the SWF couldn't begin loading from the server
+	in that short amount of time. Otherwise, some browsers may load the SWF immediately from the cache and the timeout alert will not trigger, even though it's only 1 millisecond long.
+	This demo does add a random GET string to the end of the SWF's URL to try to avoid the cache making this test appear to function incorrectly.</b>
+</p>
+<p>Text before the alt content.</p>
+<div id="mycontent" style="visibility:hidden;width:460px;height:85px;">This is alternate content for when the SWF cannot be shown because of a plugin installation or version issue, or because the SWF fails to load. This text should be replaced by the SWF.</div>
+<p>Text after the alt content.</p>
+
+<p>
+	These demos illustrate the 'options' parameter (formerly 'DoSWFCallback') to DoSWF.
+</p>
+<p>
+	Demo 'b' shows the 'swfTimeout' property, which specifies a number of milliseconds (in this demo, only 1, to ensure it fires) to wait after starting the SWF embed for it
+	to start downloading. When the timeout fires, the swfCB callback is notified with the SWF_TIMEOUT event status value.
+</p>
+</body>
+</html>
